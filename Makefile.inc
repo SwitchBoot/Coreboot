@@ -148,17 +148,15 @@ ws_to_under=$(shell echo '$1' | tr ' \t' '_')
 
 #######################################################################
 # Helper functions for ramstage postprocess
-spc :=
-spc +=
-$(spc) :=
-$(spc) +=
+empty :=
+space := $(empty) $(empty)
 comma := ,
 
 # files-in-dir-recursive,dir,files
 files-in-dir-recursive=$(filter $(1)%,$(2))
 
 # parent-dir,dir/
-parent-dir=$(dir $(if $(patsubst /%,,$(1)),,/)$(subst $( ),/,$(strip $(subst /, ,$(1)))))
+parent-dir=$(dir $(if $(patsubst /%,,$(1)),,/)$(subst $(space),/,$(strip $(subst /, ,$(1)))))
 
 # filters out exactly the directory specified
 # filter-out-dir,dir_to_keep,dirs
@@ -326,7 +324,7 @@ cbfs-files-handler= \
 			$(eval tmp-cbfs-file:=$(shell mkdir -p $(obj)/mainboard/$(MAINBOARDDIR); mktemp $(obj)/mainboard/$(MAINBOARDDIR)/cbfs-file.XXXXXX).out) \
 			$(call cbfs-files-processor-$(tmp-cbfs-method),$(tmp-old-cbfs-file),$(tmp-cbfs-file))) \
 		$(if $(tmp-cbfs-file), \
-			$(eval cbfs-files += $(subst $(spc),*,$(tmp-cbfs-file)|$(2)|$($(2)-type)|$($(2)-compression)|$(strip $($(2)-position))|$($(2)-align)|$($(2)-options)))) \
+			$(eval cbfs-files += $(subst $(space),*,$(tmp-cbfs-file)|$(2)|$($(2)-type)|$($(2)-compression)|$(strip $($(2)-position))|$($(2)-align)|$($(2)-options)))) \
 		$(eval $(2)-name:=) \
 		$(eval $(2)-type:=) \
 		$(eval $(2)-compression:=) \
@@ -658,7 +656,7 @@ $(objcbfs)/%.elf: $(objcbfs)/%.debug
 # 2) extract the specified section from the string - this gets us the section surrounded by '-' characters
 # 3) remove the leading and trailing '-' characters
 # 4) replace all '*' characters with spaces
-extract_nth=$(subst *,$(spc),$(patsubst -%-,%,$(word $(1), $(subst |,- -,-$(2)-))))
+extract_nth=$(subst *,$(space),$(patsubst -%-,%,$(word $(1), $(subst |,- -,-$(2)-))))
 
 # regions-for-file - Returns a cbfstool regions parameter
 # $(call regions-for-file,$(filename))
@@ -712,7 +710,7 @@ prebuilt-files = $(foreach file,$(cbfs-files), $(call extract_nth,1,$(file)))
 
 # $(all-regions)
 # returns full list of fmap regions that we add files to
-all-regions = $(sort $(subst $(comma),$(spc), \
+all-regions = $(sort $(subst $(comma),$(space), \
 	$(foreach file,$(cbfs-files), \
 		$(call regions-for-file,$(call extract_nth,2,$(file))))))
 
@@ -721,7 +719,7 @@ all-regions = $(sort $(subst $(comma),$(spc), \
 # they appear in $(cbfs-files)
 all-files-in-region = $(foreach file,$(cbfs-files), \
 	$(if $(filter $(1), \
-		$(subst $(comma),$(spc),$(call regions-for-file,$(call extract_nth,2,$(file))))), \
+		$(subst $(comma),$(space),$(call regions-for-file,$(call extract_nth,2,$(file))))), \
 		$(file)))
 
 # $(call update-file-for-region,file string from $(cbfs-files),region name)
@@ -730,7 +728,7 @@ all-files-in-region = $(foreach file,$(cbfs-files), \
 # position and align)
 # Returns the updated file string
 update-file-for-region = \
-	$(subst $(spc),*,$(call extract_nth,1,$(1))|$(call extract_nth,2,$(1))|$(call extract_nth,3,$(1))|$(call extract_nth,4,$(1))|$($(call extract_nth,2,$(1))-$(2)-position)|$($(call extract_nth,2,$(1))-$(2)-align)|$(call extract_nth,7,$(1)))
+	$(subst $(space),*,$(call extract_nth,1,$(1))|$(call extract_nth,2,$(1))|$(call extract_nth,3,$(1))|$(call extract_nth,4,$(1))|$($(call extract_nth,2,$(1))-$(2)-position)|$($(call extract_nth,2,$(1))-$(2)-align)|$(call extract_nth,7,$(1)))
 
 # $(call placed-files-in-region,region name)
 # like all-files-in-region, but updates the files to contain region overrides
@@ -980,7 +978,7 @@ endif
 	@printf "    CBFSLAYOUT  $(subst $(obj)/,,$(@))\n\n"
 	$(CBFSTOOL) $@ layout
 	@printf "    CBFSPRINT  $(subst $(obj)/,,$(@))\n\n"
-	$(CBFSTOOL) $@ print -r $(subst $(spc),$(comma),$(all-regions))
+	$(CBFSTOOL) $@ print -r $(subst $(space),$(comma),$(all-regions))
 
 cbfs-files-y += $(CONFIG_CBFS_PREFIX)/romstage
 $(CONFIG_CBFS_PREFIX)/romstage-file := $(objcbfs)/romstage.elf
