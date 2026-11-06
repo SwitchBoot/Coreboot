@@ -170,7 +170,7 @@ BL31_MAKEARGS += IS_ANYTHING_TO_BUILD=1
 # The \# \" complications exist to satisfy both gnu make's parser and editors
 # with non-semantic quote-handling (that would assume that this line starts a
 # multi line string.
-BL31_MAKEARGS += BUILD_MESSAGE_TIMESTAMP='"$(shell grep "\#define COREBOOT_BUILD\>" $(obj)/build.h |cut -d\" -f2 \# \")"'
+BL31_MAKEARGS += BUILD_MESSAGE_TIMESTAMP='"$(shell sed -n "s/^\#define COREBOOT_BUILD \"\(.*\)\".*/\1/p" $(obj)/build.h)"'
 
 BL31_CFLAGS := -fno-pic -fno-stack-protector -Wno-deprecated-declarations -Wno-unused-function
 BL31_LDFLAGS := --emit-relocs
