@@ -424,7 +424,7 @@ ADAFLAGS_common += -gnatwa.eeD.HHTU.U.W.Y
 # Disable style checks for now
 ADAFLAGS_common += -gnatyN
 
-LDFLAGS_common := --gc-sections -nostdlib -nostartfiles -static --emit-relocs
+LDFLAGS_common := --gc-sections -nostdlib -static --emit-relocs
 
 ifeq ($(CONFIG_COMPILER_GCC),y)
 # cf. commit f69a99db (coreboot: x86: enable gc-sections)
